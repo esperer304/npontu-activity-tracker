@@ -15,38 +15,46 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
         return view('auth.register');
     }
 
     /**
-     * Handle an incoming registration request.
-     *
      * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
+        $data = $request->validate([
+            'last_name'   => ['required', 'string', 'max:100'],
+            'middle_name' => ['nullable', 'string', 'max:100'],
+            'first_name'  => ['required', 'string', 'max:100'],
             'employee_id' => ['nullable', 'string', 'max:50', 'unique:'.User::class.',employee_id'],
-            'phone'       => ['nullable', 'string', 'max:30'],
+            'phone'       => ['nullable', 'string', 'max:20', 'regex:/^\+?[0-9 \-()]{7,20}$/'],
             'department'  => ['nullable', 'string', 'max:100'],
             'email'       => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password'    => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'phone.regex' => 'Phone number may only contain digits, spaces, +, -, or ( ). Letters are not allowed.',
         ]);
 
+        $fullName = trim(collect([
+            $data['first_name'],
+            $data['middle_name'] ?? null,
+            $data['last_name'],
+        ])->filter()->implode(' '));
+
         $user = User::create([
-            'name'        => $request->name,
-            'employee_id' => $request->employee_id,
-            'phone'       => $request->phone,
-            'department'  => $request->department,
+            'name'        => $fullName,
+            'first_name'  => $data['first_name'],
+            'middle_name' => $data['middle_name'] ?? null,
+            'last_name'   => $data['last_name'],
+            'employee_id' => $data['employee_id'] ?? null,
+            'phone'       => $data['phone'] ?? null,
+            'department'  => $data['department'] ?? null,
             'role'        => User::ROLE_SUPPORT,
-            'email'       => $request->email,
-            'password'    => Hash::make($request->password),
+            'email'       => $data['email'],
+            'password'    => Hash::make($data['password']),
         ]);
 
         event(new Registered($user));

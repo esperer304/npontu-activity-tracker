@@ -133,6 +133,14 @@ The interface uses Npontu's brand palette (green `#1F7A3A`, yellow `#F5C518`, wh
 - **Activities** — master list of recurring checks; admin can create / edit / archive.
 - **Reports** — filterable by date range, activity, personnel, and status; with summary stats and CSV export.
 
+### Light / dark mode
+
+Toggle via the sun / moon button in the top bar. Preference is persisted in `localStorage` and applied via a FOUC-safe inline bootstrap script before paint, so there's no white flash on dark-mode reload. Falls back to the OS `prefers-color-scheme` on first visit.
+
+### Mobile responsive
+
+Sidebar collapses to a hamburger-triggered off-canvas drawer below the `lg` breakpoint (1024px). Stat grids reflow from 4 columns → 2 columns, the inline status-update form stacks vertically, and tables in Activities / Reports scroll horizontally to preserve column alignment on narrow viewports.
+
 ---
 
 ## What's deliberately not in this build (honest scope)
