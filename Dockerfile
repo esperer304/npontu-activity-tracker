@@ -6,12 +6,16 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # System deps + PHP extensions
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        git unzip curl ca-certificates \
+        git unzip curl ca-certificates gnupg \
         libpq-dev libzip-dev libicu-dev libonig-dev \
         zlib1g-dev libpng-dev libxml2-dev \
-        nodejs npm \
     && docker-php-ext-install -j$(nproc) \
         pdo pdo_pgsql pgsql zip intl bcmath mbstring opcache \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Node 22 from NodeSource (Vite 8 needs Node 20+, Debian's nodejs is still 18)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Composer
