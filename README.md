@@ -154,6 +154,31 @@ Sidebar collapses to a hamburger-triggered off-canvas drawer below the `lg` brea
 
 ---
 
+## Deployment
+
+The repo ships with a Render blueprint (`render.yaml`) and a `Dockerfile` for one-click deployment.
+
+**To deploy on Render** (free tier, no credit card required):
+
+1. Push the repo to GitHub (already done).
+2. Sign in at [dashboard.render.com](https://dashboard.render.com).
+3. **New** → **Blueprint** → pick this repo.
+4. Render reads `render.yaml`, provisions a free PostgreSQL database + web service, and starts the first build (~5–8 min).
+5. Visit the generated `https://<service>.onrender.com` URL.
+
+On first boot the entrypoint runs migrations and seeds demo data idempotently. Subsequent deploys re-run migrations only.
+
+### How the deploy is wired
+
+- **Dockerfile** — PHP 8.3 CLI + Node, installs deps, builds Vite assets, copies app
+- **docker-entrypoint.sh** — caches config, runs migrations, idempotent seed, starts `php artisan serve` on `$PORT`
+- **render.yaml** — declares the web service + free PostgreSQL DB, wires `DB_URL` from the DB to the web service automatically
+- **bootstrap/app.php** — trusts Render's reverse proxy so HTTPS, host, and client IP are detected correctly
+
+The app is fully portable between SQLite (local default) and PostgreSQL (production) — toggle via `DB_CONNECTION` in `.env`.
+
+---
+
 ## Submitted by
 
 **Lona Ayeh** — Platforms Developer interview, Npontu Technologies, June 2026.

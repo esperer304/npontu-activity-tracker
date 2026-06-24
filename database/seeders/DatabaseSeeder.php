@@ -16,6 +16,13 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        // Idempotent: skip seeding if the database already has data.
+        // Safe to call db:seed on every deploy.
+        if (User::query()->exists()) {
+            $this->command?->info('Database already seeded — skipping.');
+            return;
+        }
+
         $admin = User::create([
             'name'        => 'Lona Ayeh',
             'employee_id' => 'NPT-001',
