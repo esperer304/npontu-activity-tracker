@@ -157,3 +157,4 @@ Sidebar collapses to a hamburger-triggered off-canvas drawer below the `lg` brea
 ## Submitted by
 
 **Lona Ayeh** — Platforms Developer interview, Npontu Technologies, June 2026.
+
